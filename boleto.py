@@ -3,14 +3,14 @@ from datetime import datetime
 
 from utils import (
     normalizar_texto,
-    _extrair_numeros,
-    _normalizar_data,
-    _modulo10,
-    _validar_chave_nf
+    extrair_numeros,
+    normalizar_data,
+    modulo10,
+    validar_chave_nf
 )
 
 
-def _validar_linha_digitavel(linha):
+def validar_linha_digitavel(linha):
     if len(linha) not in (47, 48):
         return False
 
@@ -31,9 +31,9 @@ def _validar_linha_digitavel(linha):
             dv3 = int(linha[31])
 
             return (
-                _modulo10(campo1) == dv1 and
-                _modulo10(campo2) == dv2 and
-                _modulo10(campo3) == dv3
+                modulo10(campo1) == dv1 and
+                modulo10(campo2) == dv2 and
+                modulo10(campo3) == dv3
             )
 
         # arrecadação
@@ -46,7 +46,7 @@ def _validar_linha_digitavel(linha):
                 bloco = linha[i*12:(i*12)+11]
                 dv = int(linha[(i*12)+11])
 
-                if _modulo10(bloco) != dv:
+                if modulo10(bloco) != dv:
                     return False
 
             return True
@@ -58,16 +58,16 @@ def _validar_linha_digitavel(linha):
 
 
 def extrair_linha_digitavel(texto):
-    numeros = _extrair_numeros(texto)
+    numeros = extrair_numeros(texto)
 
     for i in range(len(numeros) - 46):
 
         trecho47 = numeros[i:i+47]
-        if _validar_linha_digitavel(trecho47):
+        if validar_linha_digitavel(trecho47):
             return trecho47
 
         trecho48 = numeros[i:i+48]
-        if _validar_linha_digitavel(trecho48):
+        if validar_linha_digitavel(trecho48):
             return trecho48
 
     return ''
@@ -116,7 +116,7 @@ def extrair_dados_boleto(texto):
         # Linha digitável
         if len(num) in (47, 48) and not linha_digitavel:
 
-            if _validar_linha_digitavel(num):
+            if validar_linha_digitavel(num):
                 linha_digitavel = num
 
             continue
@@ -124,7 +124,7 @@ def extrair_dados_boleto(texto):
         # Código barras 44
         if len(num) == 44 and not codigo_barras:
 
-            if not _validar_chave_nf(num):
+            if not validar_chave_nf(num):
                 codigo_barras = num
 
             continue
@@ -137,7 +137,7 @@ def extrair_dados_boleto(texto):
     )
 
     if m_venc:
-        data_vencimento = _normalizar_data(m_venc.group(2))
+        data_vencimento = normalizar_data(m_venc.group(2))
 
     # -------------------------
     # Emissão
@@ -147,7 +147,7 @@ def extrair_dados_boleto(texto):
     )
 
     if m_emi:
-        data_emissao = _normalizar_data(m_emi.group(2))
+        data_emissao = normalizar_data(m_emi.group(2))
 
     else:
 

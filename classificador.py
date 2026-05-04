@@ -3,10 +3,10 @@ import re
 from leitor_pdf import extrair_texto_pdf
 from boleto import extrair_dados_boleto, extrair_linha_digitavel
 from nota_fiscal import extrair_dados_nf
-from utils import _validar_chave_nf
+from utils import validar_chave_nf
 
 
-def _classificar_documento(texto):
+def classificar_documento(texto):
 
     t = texto.upper()
 
@@ -69,7 +69,7 @@ def _classificar_documento(texto):
 
                 chave = limpo[i:i+44]
 
-                if _validar_chave_nf(chave):
+                if validar_chave_nf(chave):
 
                     if any(x in t for x in [
                         'DANFE',
@@ -122,7 +122,7 @@ def processar_documento(caminho_pdf):
             'erro': 'PDF sem texto'
         }
 
-    sb, snf, sr = _classificar_documento(texto)
+    sb, snf, sr = classificar_documento(texto)
 
     dados_boleto = extrair_dados_boleto(texto)
     dados_nf = extrair_dados_nf(texto)

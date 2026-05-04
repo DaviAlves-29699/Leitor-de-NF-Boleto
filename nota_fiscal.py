@@ -1,8 +1,8 @@
 import re
 
 from utils import (
-    _normalizar_data,
-    _validar_chave_nf
+    normalizar_data,
+    validar_chave_nf
 )
 
 
@@ -22,13 +22,13 @@ def extrair_dados_nf(texto):
     )
 
     if m_emi:
-        data_emissao = _normalizar_data(m_emi.group(2))
+        data_emissao = normalizar_data(m_emi.group(2))
 
     else:
         datas = re.findall(r'\d{2}/\d{2}/\d{4}', texto)
 
         if datas:
-            data_emissao = _normalizar_data(datas[0])
+            data_emissao = normalizar_data(datas[0])
 
     # -------------------------
     # CHAVE DE ACESSO
@@ -44,7 +44,7 @@ def extrair_dados_nf(texto):
         if limpo.startswith('000000'):
             continue
 
-        if _validar_chave_nf(limpo):
+        if validar_chave_nf(limpo):
             chave = limpo
             break
 

@@ -8,11 +8,11 @@ def normalizar_texto(texto):
     return texto.upper().strip()
 
 
-def _extrair_numeros(texto):
+def extrair_numeros(texto):
     return re.sub(r'\D', '', texto)
 
 
-def _normalizar_data(raw):
+def normalizar_data(raw):
     raw = raw.strip()
 
     m = re.match(r'^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$', raw)
@@ -30,7 +30,7 @@ def _normalizar_data(raw):
     return raw
 
 
-def _modulo10(numero):
+def modulo10(numero):
     soma = 0
     peso = 2
 
@@ -47,7 +47,7 @@ def _modulo10(numero):
     return 0 if resto == 0 else 10 - resto
 
 
-def _modulo11_nfe(chave):
+def modulo11_nfe(chave):
     if len(chave) != 44:
         return False
 
@@ -66,5 +66,5 @@ def _modulo11_nfe(chave):
     return dv == int(chave[-1])
 
 
-def _validar_chave_nf(chave):
-    return len(chave) == 44 and chave.isdigit() and _modulo11_nfe(chave)
+def validar_chave_nf(chave):
+    return len(chave) == 44 and chave.isdigit() and modulo11_nfe(chave)

@@ -5,7 +5,7 @@ from classificador import processar_documento
 
 def main():
 
-    pasta = r"\\DTI-009812\arquivos$"
+    pasta = r"\\repositorio\arquivos"
 
     print(f"Lendo arquivos de: {pasta}")
 

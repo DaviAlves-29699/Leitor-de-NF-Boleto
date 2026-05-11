@@ -10,6 +10,10 @@ from utils import (
 )
 
 
+# =====================================================
+# VALIDAÇÃO LINHA DIGITÁVEL
+# =====================================================
+
 def validar_linha_digitavel(linha):
     if len(linha) not in (47, 48):
         return False
@@ -57,6 +61,10 @@ def validar_linha_digitavel(linha):
     return False
 
 
+# =====================================================
+# EXTRAI LINHA DIGITÁVEL REAL
+# =====================================================
+
 def extrair_linha_digitavel(texto):
     numeros = extrair_numeros(texto)
 
@@ -72,6 +80,10 @@ def extrair_linha_digitavel(texto):
 
     return ''
 
+
+# =====================================================
+# CONVERTE PARA CÓDIGO BARRAS
+# =====================================================
 
 def linha_digitavel_para_codigo_barras(linha):
 
@@ -96,6 +108,32 @@ def linha_digitavel_para_codigo_barras(linha):
     return ''
 
 
+# =====================================================
+# CONTEXTO DE BOLETO
+# =====================================================
+
+def score_contexto_boleto(texto):
+    t = texto.upper()
+
+    termos = [
+        'LINHA DIGITAVEL',
+        'LINHA DIGITÁVEL',
+        'FICHA DE COMPENSAÇÃO',
+        'NOSSO NÚMERO',
+        'VENCIMENTO',
+        'PAGÁVEL',
+        'BENEFICIÁRIO',
+        'CEDENTE',
+        'SACADO'
+    ]
+
+    return sum(1 for termo in termos if termo in t)
+
+
+# =====================================================
+# EXTRAÇÃO PRINCIPAL
+# =====================================================
+
 def extrair_dados_boleto(texto):
 
     texto = normalizar_texto(texto)
@@ -105,51 +143,71 @@ def extrair_dados_boleto(texto):
     data_vencimento = ''
     data_emissao = ''
 
-    # -------------------------
-    # Números candidatos
-    candidatos = re.findall(r'[\d\.\s]{30,}', texto)
+    contexto = score_contexto_boleto(texto)
 
-    for candidato in candidatos:
+    # -------------------------------------------------
+    # 1 - linha digitável válida
+    # -------------------------------------------------
+    linha_digitavel = extrair_linha_digitavel(texto)
 
-        num = re.sub(r'\D', '', candidato)
+    if linha_digitavel:
+        codigo_barras = linha_digitavel_para_codigo_barras(
+            linha_digitavel
+        )
 
-        # Linha digitável
-        if len(num) in (47, 48) and not linha_digitavel:
+    # -------------------------------------------------
+    # 2 - se não tem linha e contexto fraco = não boleto
+    # -------------------------------------------------
+    if not linha_digitavel and contexto < 2:
+        return {
+            'linha_digitavel': '',
+            'codigo_barras': '',
+            'data_vencimento': '',
+            'data_emissao': ''
+        }
 
-            if validar_linha_digitavel(num):
-                linha_digitavel = num
+    # -------------------------------------------------
+    # 3 - procurar código barras 44 somente se contexto
+    # -------------------------------------------------
+    if not codigo_barras:
 
-            continue
+        candidatos = re.findall(r'\d{44}', extrair_numeros(texto))
 
-        # Código barras 44
-        if len(num) == 44 and not codigo_barras:
+        for num in candidatos:
 
-            if not validar_chave_nf(num):
+            if validar_chave_nf(num):
+                continue
+
+            if num[0] in '123456789':
                 codigo_barras = num
+                break
 
-            continue
-
-    # -------------------------
-    # Vencimento
+    # -------------------------------------------------
+    # 4 - vencimento
+    # -------------------------------------------------
     m_venc = re.search(
         r'(VENCIMENTO|DATA DE VENCIMENTO)[^\d]*(\d{2}/\d{2}/\d{4})',
-        texto
+        texto,
+        re.I
     )
 
     if m_venc:
         data_vencimento = normalizar_data(m_venc.group(2))
 
-    # -------------------------
-    # Emissão
+    # -------------------------------------------------
+    # 5 - emissão
+    # -------------------------------------------------
     m_emi = re.search(
-        r'(EMISS[ÃA]O|DATA DE EMISS[ÃA]O|DOCUMENTO)[^\d]*(\d{2}/\d{2}/\d{4})',
-        texto
+        r'(EMISS[ÃA]O|DATA DE EMISS[ÃA]O)[^\d]*(\d{2}/\d{2}/\d{4})',
+        texto,
+        re.I
     )
 
     if m_emi:
         data_emissao = normalizar_data(m_emi.group(2))
 
-    else:
+    # fallback inteligente
+    if not data_emissao:
 
         datas = re.findall(r'\d{2}/\d{2}/\d{4}', texto)
 
@@ -166,36 +224,8 @@ def extrair_dados_boleto(texto):
                 pass
 
         if datas_validas:
-
             datas_validas.sort()
-
-            if data_vencimento:
-
-                try:
-                    venc = datetime.strptime(
-                        data_vencimento,
-                        "%d/%m/%Y"
-                    )
-
-                    anteriores = [
-                        d for d in datas_validas
-                        if d <= venc
-                    ]
-
-                    if anteriores:
-                        data_emissao = anteriores[-1].strftime("%d/%m/%Y")
-                    else:
-                        data_emissao = datas_validas[0].strftime("%d/%m/%Y")
-
-                except:
-                    data_emissao = datas_validas[0].strftime("%d/%m/%Y")
-
-            else:
-                data_emissao = datas_validas[0].strftime("%d/%m/%Y")
-
-    # -------------------------
-    if not codigo_barras and linha_digitavel:
-        codigo_barras = linha_digitavel_para_codigo_barras(linha_digitavel)
+            data_emissao = datas_validas[0].strftime("%d/%m/%Y")
 
     return {
         'linha_digitavel': linha_digitavel,

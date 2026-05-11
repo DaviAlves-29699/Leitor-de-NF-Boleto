@@ -1,10 +1,6 @@
 import re
 
-from utils import (
-    normalizar_data,
-    validar_chave_nf
-)
-
+from utils import (normalizar_data, validar_chave_nf)
 
 def extrair_dados_nf(texto):
 
@@ -13,7 +9,6 @@ def extrair_dados_nf(texto):
 
     texto_upper = texto.upper()
 
-    # -------------------------
     # DATA EMISSÃO
     m_emi = re.search(
         r'(EMISS[ÃA]O|DATA DE EMISS[ÃA]O|DATA DOCUMENTO|DATA DO DOCUMENTO|PROCESSAMENTO)[:\s]*(\d{2}/\d{2}/\d{2,4})',
@@ -30,7 +25,6 @@ def extrair_dados_nf(texto):
         if datas:
             data_emissao = normalizar_data(datas[0])
 
-    # -------------------------
     # CHAVE DE ACESSO
     matches = re.finditer(r'(\d[\s.]*){44}', texto_upper)
 

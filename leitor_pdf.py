@@ -8,7 +8,7 @@ def extrair_texto_pdf(alvo):
     try:
         with pdfplumber.open(alvo) as pdf:
 
-            for pagina in pdf.pages[:5]:   # limita páginas
+            for pagina in pdf.pages[:5]:  # limita páginas
 
                 try:
                     texto = pagina.extract_text()

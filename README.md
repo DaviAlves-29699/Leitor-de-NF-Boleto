@@ -6,7 +6,6 @@ O projeto identifica documentos como:
 
 - Boletos Bancários
 - Notas Fiscais (NF-e / NFS-e / NFCOM)
-- Recibos / Comprovantes
 - Documentos desconhecidos
 
 Além disso, realiza extração automática de informações importantes.

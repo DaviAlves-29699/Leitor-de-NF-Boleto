@@ -15,7 +15,6 @@ def classificar_documento(texto):
     sr = 0
 
     # BOLETO
-    
     termos_boleto = [
         'LINHA DIGITAVEL',
         'LINHA DIGITÁVEL',
@@ -34,7 +33,6 @@ def classificar_documento(texto):
             sb += 15
 
     # NOTA FISCAL
-    
     termos_nf = [
         'DANFE',
         'DOCUMENTO AUXILIAR DA NOTA FISCAL',
@@ -60,7 +58,6 @@ def classificar_documento(texto):
             snf += 15
 
     # CHAVE NF VÁLIDA
-    
     numeros = re.findall(r'(\d[\d\s\.-]{40,})', t)
 
     for trecho in numeros:
@@ -86,7 +83,6 @@ def classificar_documento(texto):
                     break
 
     # OUTROS
-    
     termos_outros = [
         'RECIBO',
         'COMPROVANTE',
@@ -103,7 +99,6 @@ def classificar_documento(texto):
     sr = max(0, min(sr, 100))
 
     return sb, snf, sr
-
 
 def processar_documento(caminho_pdf):
 
@@ -154,7 +149,6 @@ def processar_documento(caminho_pdf):
     qtd_nf = sum(1 for x in termos_nf if x in t)
 
     # PRIORIDADE 1 - NOME DO ARQUIVO
-
     if 'BOLETO' in nome:
         return {
             'tipo': 'BOLETO',
@@ -176,7 +170,6 @@ def processar_documento(caminho_pdf):
         }
 
     # PRIORIDADE 2 - DADOS FORTES
-
     # boleto só se tiver linha + contexto boleto
     if tem_linha and (
         'VENCIMENTO' in texto.upper()
@@ -196,9 +189,8 @@ def processar_documento(caminho_pdf):
             'confianca': 95,
             **dados_nf
         }
-
+    
     # PRIORIDADE 3 - SCORE
-
     sb, snf, sr = classificar_documento(texto)
 
     if snf >= 60 and snf > sb:
@@ -223,7 +215,6 @@ def processar_documento(caminho_pdf):
         }
 
     # FINAL
-
     return {
         'tipo': 'DESCONHECIDO',
         'confianca': 0,

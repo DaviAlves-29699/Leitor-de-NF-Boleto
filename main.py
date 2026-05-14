@@ -5,7 +5,7 @@ from classificador import processar_documento
 
 def main():
 
-    pasta = "./arquivos"
+    pasta = r"Pasta/arquivos"
 
     print(f"Lendo arquivos de: {pasta}")
 
@@ -57,7 +57,6 @@ def main():
             print(f"Status: {resultado.get('erro')}")
 
         print(f"DEBUG → confiança: {resultado.get('confianca')}")
-
 
 if __name__ == "__main__":
     main()

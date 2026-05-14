@@ -9,11 +9,7 @@ from utils import (
     validar_chave_nf
 )
 
-
-# =====================================================
 # VALIDAÇÃO LINHA DIGITÁVEL
-# =====================================================
-
 def validar_linha_digitavel(linha):
     if len(linha) not in (47, 48):
         return False
@@ -60,11 +56,7 @@ def validar_linha_digitavel(linha):
 
     return False
 
-
-# =====================================================
 # EXTRAI LINHA DIGITÁVEL REAL
-# =====================================================
-
 def extrair_linha_digitavel(texto):
     numeros = extrair_numeros(texto)
 
@@ -80,11 +72,7 @@ def extrair_linha_digitavel(texto):
 
     return ''
 
-
-# =====================================================
 # CONVERTE PARA CÓDIGO BARRAS
-# =====================================================
-
 def linha_digitavel_para_codigo_barras(linha):
 
     if len(linha) == 47:
@@ -107,11 +95,7 @@ def linha_digitavel_para_codigo_barras(linha):
 
     return ''
 
-
-# =====================================================
 # CONTEXTO DE BOLETO
-# =====================================================
-
 def score_contexto_boleto(texto):
     t = texto.upper()
 
@@ -129,11 +113,7 @@ def score_contexto_boleto(texto):
 
     return sum(1 for termo in termos if termo in t)
 
-
-# =====================================================
 # EXTRAÇÃO PRINCIPAL
-# =====================================================
-
 def extrair_dados_boleto(texto):
 
     texto = normalizar_texto(texto)
@@ -145,9 +125,7 @@ def extrair_dados_boleto(texto):
 
     contexto = score_contexto_boleto(texto)
 
-    # -------------------------------------------------
-    # 1 - linha digitável válida
-    # -------------------------------------------------
+    # linha digitável válida
     linha_digitavel = extrair_linha_digitavel(texto)
 
     if linha_digitavel:
@@ -155,9 +133,7 @@ def extrair_dados_boleto(texto):
             linha_digitavel
         )
 
-    # -------------------------------------------------
-    # 2 - se não tem linha e contexto fraco = não boleto
-    # -------------------------------------------------
+    # se não tem linha e contexto fraco = não boleto
     if not linha_digitavel and contexto < 2:
         return {
             'linha_digitavel': '',
@@ -166,9 +142,7 @@ def extrair_dados_boleto(texto):
             'data_emissao': ''
         }
 
-    # -------------------------------------------------
-    # 3 - procurar código barras 44 somente se contexto
-    # -------------------------------------------------
+    # procurar código barras 44 somente se contexto
     if not codigo_barras:
 
         candidatos = re.findall(r'\d{44}', extrair_numeros(texto))
@@ -182,9 +156,7 @@ def extrair_dados_boleto(texto):
                 codigo_barras = num
                 break
 
-    # -------------------------------------------------
-    # 4 - vencimento
-    # -------------------------------------------------
+    # vencimento
     m_venc = re.search(
         r'(VENCIMENTO|DATA DE VENCIMENTO)[^\d]*(\d{2}/\d{2}/\d{4})',
         texto,
@@ -194,9 +166,7 @@ def extrair_dados_boleto(texto):
     if m_venc:
         data_vencimento = normalizar_data(m_venc.group(2))
 
-    # -------------------------------------------------
-    # 5 - emissão
-    # -------------------------------------------------
+    # emissão
     m_emi = re.search(
         r'(EMISS[ÃA]O|DATA DE EMISS[ÃA]O)[^\d]*(\d{2}/\d{2}/\d{4})',
         texto,

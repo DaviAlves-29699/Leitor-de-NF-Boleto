@@ -6,6 +6,7 @@ O projeto identifica documentos como:
 
 - Boletos Bancários
 - Notas Fiscais (NF-e / NFS-e / NFCOM)
+- Recibos / Comprovantes
 - Documentos desconhecidos
 
 Além disso, realiza extração automática de informações importantes.
@@ -46,8 +47,6 @@ Lê automaticamente todos os PDFs de uma pasta.
 - Python 3
 - Regex
 - pdfplumber
-- pdfminer.six
-- PyPDF2
 
 ---
 

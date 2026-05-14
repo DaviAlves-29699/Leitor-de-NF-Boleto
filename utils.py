@@ -7,10 +7,8 @@ def normalizar_texto(texto):
     texto = re.sub(r'\s+', ' ', texto)
     return texto.upper().strip()
 
-
 def extrair_numeros(texto):
     return re.sub(r'\D', '', texto)
-
 
 def normalizar_data(raw):
     raw = raw.strip()
@@ -29,7 +27,6 @@ def normalizar_data(raw):
 
     return raw
 
-
 def modulo10(numero):
     soma = 0
     peso = 2
@@ -45,7 +42,6 @@ def modulo10(numero):
 
     resto = soma % 10
     return 0 if resto == 0 else 10 - resto
-
 
 def modulo11_nfe(chave):
     if len(chave) != 44:
@@ -64,7 +60,6 @@ def modulo11_nfe(chave):
         dv = 0
 
     return dv == int(chave[-1])
-
 
 def validar_chave_nf(chave):
     return len(chave) == 44 and chave.isdigit() and modulo11_nfe(chave)

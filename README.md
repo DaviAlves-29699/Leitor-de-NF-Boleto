@@ -44,8 +44,7 @@ Lê automaticamente todos os PDFs de uma pasta.
 
 # Tecnologias Utilizadas
 
-- Python 3
-- Regex
+- Python 
 - pdfplumber
 
 ---
